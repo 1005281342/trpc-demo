@@ -10,7 +10,10 @@ import (
 
 func main() {
 	s := trpc.NewServer()
-	pb.RegisterHelloWorldServiceService(s.Service("helloworld.HelloWorldService"), &helloWorldServiceImpl{})
+	pb.RegisterHelloWorldServiceService(s.Service("helloworld.HelloWorldService"),
+		&helloWorldServiceImpl{})
+	pb.RegisterHelloWorldServiceService(s.Service("helloworld.HelloWorldServiceHTTP"),
+		&helloWorldServiceImpl{})
 	if err := s.Serve(); err != nil {
 		log.Fatal(err)
 	}

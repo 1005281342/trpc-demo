@@ -198,3 +198,88 @@ service HelloWorldService {
   ```
   2023-10-21 16:47:08.697 DEBUG   debuglog@v1.0.0/log.go:196      server request:/helloworld.HelloWorldService/SayHi, cost:3.751µs, from:127.0.0.1:52401
   ```
+  
+## 配置 HTTP 服务
+
+参考 [泛 HTTP RPC 服务](https://github.com/trpc-group/trpc-go/blob/main/http/README.zh_CN.md#%E6%B3%9B-http-rpc-%E6%9C%8D%E5%8A%A1)
+
+### 在 `trpc_go.yaml` 注册 HTTP 服务配置
+
+可以直接从原来自动生成的 tRPC `helloworld.HelloWorldService` 服务配置复制修改
+
+- 修改服务名字，可以添加后缀 `HTTP` 得到 http 服务名字 `helloworld.HelloWorldServiceHTTP`
+- 修改协议，protocol 设置为 http
+- 修改端口，使用一个未被占用的端口
+
+```yaml
+  service:  # Services provided by the business, can have multiple.
+    - name: helloworld.HelloWorldService  # Route name for the service.
+      ip: 127.0.0.1  # Service listening IP address, can use placeholder ${ip}. Use either ip or nic, ip takes priority.
+      # nic: eth0
+      port: 8000  # Service listening port, can use placeholder ${port}.
+      network: tcp  # Network listening type: tcp or udp.
+      protocol: trpc  # Application layer protocol: trpc or http.
+      timeout: 1000  # Maximum processing time for requests in milliseconds.
+    - name: helloworld.HelloWorldServiceHTTP  # Route name for the service.
+      ip: 127.0.0.1  # Service listening IP address, can use placeholder ${ip}. Use either ip or nic, ip takes priority.
+      # nic: eth0
+      port: 8001  # Service listening port, can use placeholder ${port}.
+      network: tcp  # Network listening type: tcp or udp.
+      protocol: http  # Application layer protocol: trpc or http.
+      timeout: 1000  # Maximum processing time for requests in milliseconds. 
+```
+
+### 在 `main.go` 注册 HTTP 服务
+```go
+func main() {
+	s := trpc.NewServer()
+	pb.RegisterHelloWorldServiceService(s.Service("helloworld.HelloWorldService"), 
+		&helloWorldServiceImpl{})
+	pb.RegisterHelloWorldServiceService(s.Service("helloworld.HelloWorldServiceHTTP"), 
+		&helloWorldServiceImpl{})
+	if err := s.Serve(); err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+### 测试
+
+- 启动服务
+
+  ```
+  2023-10-21 17:00:32.627 DEBUG   maxprocs/maxprocs.go:47 maxprocs: Leaving GOMAXPROCS=12: CPU quota undefined
+  2023-10-21 17:00:32.628 INFO    server/service.go:167   process:16524, http service:helloworld.HelloWorldServiceHTTP launch success, tcp:127.0.0.1:8001, serving ...
+  2023-10-21 17:00:32.628 INFO    server/service.go:167   process:16524, trpc service:helloworld.HelloWorldService launch success, tcp:127.0.0.1:8000, serving ...
+  ```
+
+- 测试服务
+  
+  请求  
+
+  ```http request
+  POST http://127.0.0.1:8001/helloworld.HelloWorldService/Hello
+  Content-Type: application/json
+  
+  {
+    "msg": "123"
+  }
+  ```
+  
+  响应
+
+  ```
+  POST http://127.0.0.1:8001/helloworld.HelloWorldService/Hello
+  
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+  X-Content-Type-Options: nosniff
+  Date: Sat, 21 Oct 2023 09:07:01 GMT
+  Content-Length: 13
+  
+  {
+    "msg": "123"
+  }
+  Response file saved.
+  > 2023-10-21T170701.200.json
+  ```

@@ -19,6 +19,13 @@ server:  # Server configuration.
       network: tcp  # Network listening type: tcp or udp.
       protocol: trpc  # Application layer protocol: trpc or http.
       timeout: 1000  # Maximum processing time for requests in milliseconds.
+    - name: helloworld.HelloWorldServiceHTTP  # Route name for the service.
+      ip: 127.0.0.1  # Service listening IP address, can use placeholder ${ip}. Use either ip or nic, ip takes priority.
+      # nic: eth0
+      port: 8001  # Service listening port, can use placeholder ${port}.
+      network: tcp  # Network listening type: tcp or udp.
+      protocol: http  # Application layer protocol: trpc or http.
+      timeout: 1000  # Maximum processing time for requests in milliseconds.
     
 
 client:  # Backend configuration for client calls.
