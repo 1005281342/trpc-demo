@@ -15,6 +15,8 @@ func (s *helloWorldServiceImpl) Hello(
 	ctx context.Context,
 	req *pb.HelloRequest,
 ) (*pb.HelloResponse, error) {
-	rsp := &pb.HelloResponse{}
+	rsp := &pb.HelloResponse{
+		Msg: req.GetMsg(),
+	}
 	return rsp, nil
 }

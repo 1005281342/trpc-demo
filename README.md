@@ -74,3 +74,45 @@ service HelloWorldService {
 ```
 2023-10-21 15:54:57.033 DEBUG   debuglog@v1.0.0/log.go:196      server request:/helloworld.HelloWorldService/Hello, cost:9.418µs, from:127.0.0.1:60328
 ```
+
+## 业务编码
+
+### 修改 Hello 接口
+
+- 响应用户输入的 msg
+
+    ```go
+    // Hello Hello says hello.
+    func (s *helloWorldServiceImpl) Hello(
+        ctx context.Context,
+        req *pb.HelloRequest,
+    ) (*pb.HelloResponse, error) {
+        rsp := &pb.HelloResponse{
+            Msg: req.GetMsg(),
+        }
+        return rsp, nil
+    }
+    ```
+
+- 重启服务
+
+- 修改客户端 `cmd/client/main.go` 中 `callHelloWorldServiceHello()` 的请求内容
+    
+    ```go
+    // Example usage of unary client.
+    reply, err := proxy.Hello(ctx, &pb.HelloRequest{
+        Msg: "hello tRPC",
+    })
+    ```
+- 发送请求进行测试
+
+    客户端日志
+    ```
+    2023-10-21 16:13:10.556 DEBUG   debuglog@v1.0.0/log.go:236      client request:/helloworld.HelloWorldService/Hello, cost:2.020233ms, to:127.0.0.1:8000
+    2023-10-21 16:13:10.556 DEBUG   client/main.go:27       simple  rpc   receive: msg:"hello tRPC"
+    ```        
+
+    服务端日志
+    ```
+    2023-10-21 16:13:10.556 DEBUG   debuglog@v1.0.0/log.go:196      server request:/helloworld.HelloWorldService/Hello, cost:9.456µs, from:127.0.0.1:63248
+    ```

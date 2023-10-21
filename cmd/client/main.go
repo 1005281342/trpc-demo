@@ -18,7 +18,9 @@ func callHelloWorldServiceHello() {
 	)
 	ctx := trpc.BackgroundContext()
 	// Example usage of unary client.
-	reply, err := proxy.Hello(ctx, &pb.HelloRequest{})
+	reply, err := proxy.Hello(ctx, &pb.HelloRequest{
+		Msg: "hello tRPC",
+	})
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}
