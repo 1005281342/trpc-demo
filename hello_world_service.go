@@ -20,3 +20,7 @@ func (s *helloWorldServiceImpl) Hello(
 	}
 	return rsp, nil
 }
+
+func (s *helloWorldServiceImpl) SayHi(ctx context.Context, req *pb.SayHiReq) (*pb.SayHiRsp, error) {
+	return &pb.SayHiRsp{Msg: "hi"}, nil
+}

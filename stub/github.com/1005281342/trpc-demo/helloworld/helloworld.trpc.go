@@ -21,6 +21,8 @@ import (
 type HelloWorldServiceService interface {
 	// Hello Hello says hello.
 	Hello(ctx context.Context, req *HelloRequest) (*HelloResponse, error)
+	// SayHi SayHi says hi
+	SayHi(ctx context.Context, req *SayHiReq) (*SayHiRsp, error)
 }
 
 func HelloWorldServiceService_Hello_Handler(svr interface{}, ctx context.Context, f server.FilterFunc) (interface{}, error) {
@@ -41,6 +43,24 @@ func HelloWorldServiceService_Hello_Handler(svr interface{}, ctx context.Context
 	return rsp, nil
 }
 
+func HelloWorldServiceService_SayHi_Handler(svr interface{}, ctx context.Context, f server.FilterFunc) (interface{}, error) {
+	req := &SayHiReq{}
+	filters, err := f(req)
+	if err != nil {
+		return nil, err
+	}
+	handleFunc := func(ctx context.Context, reqbody interface{}) (interface{}, error) {
+		return svr.(HelloWorldServiceService).SayHi(ctx, reqbody.(*SayHiReq))
+	}
+
+	var rsp interface{}
+	rsp, err = filters.Filter(ctx, req, handleFunc)
+	if err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
 // HelloWorldServiceServer_ServiceDesc descriptor for server.RegisterService.
 var HelloWorldServiceServer_ServiceDesc = server.ServiceDesc{
 	ServiceName: "helloworld.HelloWorldService",
@@ -49,6 +69,10 @@ var HelloWorldServiceServer_ServiceDesc = server.ServiceDesc{
 		{
 			Name: "/helloworld.HelloWorldService/Hello",
 			Func: HelloWorldServiceService_Hello_Handler,
+		},
+		{
+			Name: "/helloworld.HelloWorldService/SayHi",
+			Func: HelloWorldServiceService_SayHi_Handler,
 		},
 	},
 }
@@ -69,6 +93,11 @@ func (s *UnimplementedHelloWorldService) Hello(ctx context.Context, req *HelloRe
 	return nil, errors.New("rpc Hello of service HelloWorldService is not implemented")
 }
 
+// SayHi SayHi says hi
+func (s *UnimplementedHelloWorldService) SayHi(ctx context.Context, req *SayHiReq) (*SayHiRsp, error) {
+	return nil, errors.New("rpc SayHi of service HelloWorldService is not implemented")
+}
+
 // END --------------------------------- Default Unimplemented Server Service --------------------------------- END
 
 // END ======================================= Server Service Definition ======================================= END
@@ -79,6 +108,8 @@ func (s *UnimplementedHelloWorldService) Hello(ctx context.Context, req *HelloRe
 type HelloWorldServiceClientProxy interface {
 	// Hello Hello says hello.
 	Hello(ctx context.Context, req *HelloRequest, opts ...client.Option) (rsp *HelloResponse, err error)
+	// SayHi SayHi says hi
+	SayHi(ctx context.Context, req *SayHiReq, opts ...client.Option) (rsp *SayHiRsp, err error)
 }
 
 type HelloWorldServiceClientProxyImpl struct {
@@ -104,6 +135,26 @@ func (c *HelloWorldServiceClientProxyImpl) Hello(ctx context.Context, req *Hello
 	callopts = append(callopts, c.opts...)
 	callopts = append(callopts, opts...)
 	rsp := &HelloResponse{}
+	if err := c.client.Invoke(ctx, req, rsp, callopts...); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *HelloWorldServiceClientProxyImpl) SayHi(ctx context.Context, req *SayHiReq, opts ...client.Option) (*SayHiRsp, error) {
+	ctx, msg := codec.WithCloneMessage(ctx)
+	defer codec.PutBackMessage(msg)
+	msg.WithClientRPCName("/helloworld.HelloWorldService/SayHi")
+	msg.WithCalleeServiceName(HelloWorldServiceServer_ServiceDesc.ServiceName)
+	msg.WithCalleeApp("")
+	msg.WithCalleeServer("")
+	msg.WithCalleeService("HelloWorldService")
+	msg.WithCalleeMethod("SayHi")
+	msg.WithSerializationType(codec.SerializationTypePB)
+	callopts := make([]client.Option, 0, len(c.opts)+len(opts))
+	callopts = append(callopts, c.opts...)
+	callopts = append(callopts, opts...)
+	rsp := &SayHiRsp{}
 	if err := c.client.Invoke(ctx, req, rsp, callopts...); err != nil {
 		return nil, err
 	}

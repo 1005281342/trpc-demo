@@ -13,8 +13,18 @@ message HelloResponse {
     string msg = 1;
 }
 
+// SayHiReq is says hi request
+message SayHiReq {}
+
+// SayHiRsp is says hi response
+message SayHiRsp {
+    string msg = 1;
+}
+
 // HelloWorldService handles hello request and echo message.
 service HelloWorldService {
     // Hello says hello.
     rpc Hello(HelloRequest) returns(HelloResponse);
+    // SayHi says hi
+    rpc SayHi(SayHiReq) returns (SayHiRsp);
 }

@@ -11,6 +11,34 @@ import (
 	"trpc.group/trpc-go/trpc-go/log"
 )
 
+func main() {
+	// Load configuration following the logic in trpc.NewServer.
+	cfg, err := trpc.LoadConfig(trpc.ServerConfigPath)
+	if err != nil {
+		panic("load config fail: " + err.Error())
+	}
+	trpc.SetGlobalConfig(cfg)
+	if err := trpc.Setup(cfg); err != nil {
+		panic("setup plugin fail: " + err.Error())
+	}
+	//callHelloWorldServiceHello()
+	callHelloWorldServiceSayHi()
+}
+
+func callHelloWorldServiceSayHi() {
+	proxy := pb.NewHelloWorldServiceClientProxy(
+		client.WithTarget("ip://127.0.0.1:8000"),
+		client.WithProtocol("trpc"),
+	)
+	ctx := trpc.BackgroundContext()
+	// Example usage of unary client.
+	reply, err := proxy.SayHi(ctx, &pb.SayHiReq{})
+	if err != nil {
+		log.Fatalf("err: %v", err)
+	}
+	log.Debugf("[SayHi] -- simple  rpc   receive: %+v", reply)
+}
+
 func callHelloWorldServiceHello() {
 	proxy := pb.NewHelloWorldServiceClientProxy(
 		client.WithTarget("ip://127.0.0.1:8000"),
@@ -25,17 +53,4 @@ func callHelloWorldServiceHello() {
 		log.Fatalf("err: %v", err)
 	}
 	log.Debugf("simple  rpc   receive: %+v", reply)
-}
-
-func main() {
-	// Load configuration following the logic in trpc.NewServer.
-	cfg, err := trpc.LoadConfig(trpc.ServerConfigPath)
-	if err != nil {
-		panic("load config fail: " + err.Error())
-	}
-	trpc.SetGlobalConfig(cfg)
-	if err := trpc.Setup(cfg); err != nil {
-		panic("setup plugin fail: " + err.Error())
-	}
-	callHelloWorldServiceHello()
 }

@@ -116,3 +116,85 @@ service HelloWorldService {
     ```
     2023-10-21 16:13:10.556 DEBUG   debuglog@v1.0.0/log.go:196      server request:/helloworld.HelloWorldService/Hello, cost:9.456µs, from:127.0.0.1:63248
     ```
+  
+
+### 新增 SayHi 功能
+
+- 接口协议
+
+  ```protobuf
+  ...
+  
+  // SayHiReq is says hi request
+  message SayHiReq {}
+  
+  // SayHiRsp is says hi response
+  message SayHiRsp {
+      string msg = 1;
+  }
+  
+  // HelloWorldService handles hello request and echo message.
+  service HelloWorldService {
+      ...
+  
+      // SayHi says hi
+      rpc SayHi(SayHiReq) returns (SayHiRsp);
+  }
+  ```
+  
+- 更新桩代码 `trpc create -p helloworld.proto -o ./stub/github.com/1005281342/trpc-demo/helloworld --rpconly`
+
+- 实现 SayHi 接口
+
+  ```go
+  func (s *helloWorldServiceImpl) SayHi(ctx context.Context, req *pb.SayHiReq) (*pb.SayHiRsp, error) {
+      return &pb.SayHiRsp{Msg: "hi"}, nil
+  }
+  ```
+
+- 启动服务 `go mod tidy && go run .`
+
+- 添加测试代码
+
+  ```go
+  func main() {
+      // Load configuration following the logic in trpc.NewServer.
+      cfg, err := trpc.LoadConfig(trpc.ServerConfigPath)
+      if err != nil {
+          panic("load config fail: " + err.Error())
+      }
+      trpc.SetGlobalConfig(cfg)
+      if err := trpc.Setup(cfg); err != nil {
+          panic("setup plugin fail: " + err.Error())
+      }
+      //callHelloWorldServiceHello()
+      callHelloWorldServiceSayHi()
+  }
+  
+  func callHelloWorldServiceSayHi() {
+      proxy := pb.NewHelloWorldServiceClientProxy(
+          client.WithTarget("ip://127.0.0.1:8000"),
+          client.WithProtocol("trpc"),
+      )
+      ctx := trpc.BackgroundContext()
+      // Example usage of unary client.
+      reply, err := proxy.SayHi(ctx, &pb.SayHiReq{})
+      if err != nil {
+          log.Fatalf("err: %v", err)
+      }
+      log.Debugf("[SayHi] -- simple  rpc   receive: %+v", reply)
+  }
+  ```
+  
+- 发送请求进行测试 `go run cmd/client/main.go`
+
+  客户端日志
+  ```
+  2023-10-21 16:47:08.698 DEBUG   debuglog@v1.0.0/log.go:236      client request:/helloworld.HelloWorldService/SayHi, cost:2.969017ms, to:127.0.0.1:8000
+  2023-10-21 16:47:08.698 DEBUG   client/main.go:39       [SayHi] -- simple  rpc   receive: msg:"hi"
+  ```
+  
+  服务端日志
+  ```
+  2023-10-21 16:47:08.697 DEBUG   debuglog@v1.0.0/log.go:196      server request:/helloworld.HelloWorldService/SayHi, cost:3.751µs, from:127.0.0.1:52401
+  ```
