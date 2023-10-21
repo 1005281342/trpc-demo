@@ -7,6 +7,7 @@ require (
 	github.com/golang/protobuf v1.5.3
 	google.golang.org/protobuf v1.31.0
 	trpc.group/trpc-go/trpc-go v1.0.1
+	trpc.group/trpc/trpc-protocol/pb/go/trpc v1.0.0
 )
 
 require (
@@ -39,5 +40,4 @@ require (
 	golang.org/x/text v0.13.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	trpc.group/trpc-go/tnet v1.0.0 // indirect
-	trpc.group/trpc/trpc-protocol/pb/go/trpc v1.0.0 // indirect
 )

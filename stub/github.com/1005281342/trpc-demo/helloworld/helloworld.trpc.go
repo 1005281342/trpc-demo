@@ -67,12 +67,16 @@ var HelloWorldServiceServer_ServiceDesc = server.ServiceDesc{
 	HandlerType: ((*HelloWorldServiceService)(nil)),
 	Methods: []server.Method{
 		{
-			Name: "/helloworld.HelloWorldService/Hello",
+			Name: "/api/v1/hello-world",
 			Func: HelloWorldServiceService_Hello_Handler,
 		},
 		{
 			Name: "/helloworld.HelloWorldService/SayHi",
 			Func: HelloWorldServiceService_SayHi_Handler,
+		},
+		{
+			Name: "/helloworld.HelloWorldService/Hello",
+			Func: HelloWorldServiceService_Hello_Handler,
 		},
 	},
 }
@@ -124,7 +128,7 @@ var NewHelloWorldServiceClientProxy = func(opts ...client.Option) HelloWorldServ
 func (c *HelloWorldServiceClientProxyImpl) Hello(ctx context.Context, req *HelloRequest, opts ...client.Option) (*HelloResponse, error) {
 	ctx, msg := codec.WithCloneMessage(ctx)
 	defer codec.PutBackMessage(msg)
-	msg.WithClientRPCName("/helloworld.HelloWorldService/Hello")
+	msg.WithClientRPCName("/api/v1/hello-world")
 	msg.WithCalleeServiceName(HelloWorldServiceServer_ServiceDesc.ServiceName)
 	msg.WithCalleeApp("")
 	msg.WithCalleeServer("")

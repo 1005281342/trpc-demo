@@ -1,6 +1,8 @@
 syntax = "proto3";
 package helloworld;
 
+import "trpc/proto/trpc_options.proto";
+
 option go_package = "github.com/1005281342/trpc-demo/helloworld";
 
 // HelloRequest is hello request.
@@ -24,7 +26,7 @@ message SayHiRsp {
 // HelloWorldService handles hello request and echo message.
 service HelloWorldService {
     // Hello says hello.
-    rpc Hello(HelloRequest) returns(HelloResponse);
+    rpc Hello(HelloRequest) returns(HelloResponse) { option(trpc.alias) = "/api/v1/hello-world"; };
     // SayHi says hi
     rpc SayHi(SayHiReq) returns (SayHiRsp);
 }

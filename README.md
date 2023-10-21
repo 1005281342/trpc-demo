@@ -12,7 +12,7 @@
 
 [使用 trpc setup 一键安装所有依赖](https://github.com/trpc-group/trpc-cmdline/blob/main/README.zh_CN.md#%E4%BD%BF%E7%94%A8-trpc-setup-%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85%E6%89%80%E6%9C%89%E4%BE%9D%E8%B5%96) 
 可能会因为一些网络问题导致设置失败，可以通过如下方式手动配置
-- 下载官方提供的二进制文件，如 mac 系统的 https://github.com/trpc-group/trpc-cmdline/releases/tag/v0.0.1-darwin
+- 下载官方提供的二进制文件，如 macOS 系统的 https://github.com/trpc-group/trpc-cmdline/releases/tag/v0.0.1-darwin
 - 添加可执行权限 `chmod +x 工具二进制文件`
 - 将这些工具拷贝到 `go/bin` 目录下，并通过 `which 工具二进制文件` 确定这些工具可以被找到
 
@@ -97,7 +97,7 @@ service HelloWorldService {
 - 重启服务
 
 - 修改客户端 `cmd/client/main.go` 中 `callHelloWorldServiceHello()` 的请求内容
-    
+  
     ```go
     // Example usage of unary client.
     reply, err := proxy.Hello(ctx, &pb.HelloRequest{
@@ -110,13 +110,13 @@ service HelloWorldService {
     ```
     2023-10-21 16:13:10.556 DEBUG   debuglog@v1.0.0/log.go:236      client request:/helloworld.HelloWorldService/Hello, cost:2.020233ms, to:127.0.0.1:8000
     2023-10-21 16:13:10.556 DEBUG   client/main.go:27       simple  rpc   receive: msg:"hello tRPC"
-    ```        
+    ```
 
     服务端日志
     ```
     2023-10-21 16:13:10.556 DEBUG   debuglog@v1.0.0/log.go:196      server request:/helloworld.HelloWorldService/Hello, cost:9.456µs, from:127.0.0.1:63248
     ```
-  
+
 
 ### 新增 SayHi 功能
 
@@ -283,3 +283,63 @@ func main() {
   Response file saved.
   > 2023-10-21T170701.200.json
   ```
+  
+## 自定义接口别名
+
+[官方示例文档](https://github.com/trpc-group/trpc-cmdline/blob/main/docs/examples/example-2/README.zh_CN.md#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8E%A5%E5%8F%A3%E5%88%AB%E5%90%8D) 中介绍了两种自定义接口方式
+
+使用 `trpc.alias`，需要 import "trpc/proto/trpc_options.proto"; 
+
+然后通过 `rpc Hello(HelloRequest) returns(HelloResponse) { option(trpc.alias) = "/api/v1/hello-world"; };` 设置接口别名
+
+使用命令 `trpc create -p helloworld.proto -o ./stub/github.com/1005281342/trpc-demo/helloworld --rpconly` 重新生成桩代码
+
+![](docs/imgs/README.assets/自定义接口名-Hello.png)
+
+重启服务并测试
+
+```
+POST http://127.0.0.1:8001/api/v1/hello-world
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Date: Sat, 21 Oct 2023 16:25:01 GMT
+Content-Length: 13
+
+{
+  "msg": "123"
+}
+Response file saved.
+> 2023-10-22T002501.200.json
+```
+
+### 生成桩代码可能会遇到的问题
+
+#### google/protobuf/xxx.proto 找不到
+
+错误提示大致如下：
+
+```
+stub/github.com/1005281342/trpc-demo/helloworld helloworld.proto`, error: google/protobuf/descriptor.proto: File not found.
+trpc/proto/trpc_options.proto:3:1: Import "google/protobuf/descriptor.proto" was not found or had errors.
+trpc/proto/trpc_options.proto:10:8: "google.protobuf.MethodOptions" is not defined.
+trpc/proto/trpc_options.proto:14:8: "google.protobuf.FieldOptions" is not defined.
+helloworld.proto:4:1: Import "trpc/proto/trpc_options.proto" was not found or had errors.
+```
+
+解决方案：
+
+```
+参考：https://github.com/grpc-ecosystem/grpc-gateway/issues/422
+通过在 goland 中配置 protocol 目录手动修复
+
+In addition to copy protoc/include/google into /usr/local/include/.
+
+For Goland (or other Jetbrains IDE), need do following:
+
+preference -> language & framework -> protocol buffers,
+uncheck "configure automatically",
+add import path as /usr/local/include.
+```
+
