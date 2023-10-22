@@ -9,12 +9,14 @@ require (
 	github.com/golang/mock v1.6.0
 	trpc.group/trpc-go/trpc-filter/debuglog v1.0.0
 	trpc.group/trpc-go/trpc-filter/recovery v1.0.0
+	trpc.group/trpc-go/trpc-filter/validation v1.0.1
 	trpc.group/trpc-go/trpc-go v1.0.1
 )
 
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/envoyproxy/protoc-gen-validate v1.0.2 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-playground/form/v4 v4.2.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect

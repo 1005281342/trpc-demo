@@ -3,6 +3,7 @@ module github.com/1005281342/trpc-demo/helloworld
 go 1.18
 
 require (
+	github.com/envoyproxy/protoc-gen-validate v1.0.2
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.3
 	google.golang.org/protobuf v1.31.0

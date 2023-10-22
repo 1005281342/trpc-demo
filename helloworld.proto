@@ -2,6 +2,7 @@ syntax = "proto3";
 package helloworld;
 
 import "trpc/proto/trpc_options.proto";
+import "validate/validate.proto";
 
 option go_package = "github.com/1005281342/trpc-demo/helloworld";
 
@@ -16,7 +17,9 @@ message HelloResponse {
 }
 
 // SayHiReq is says hi request
-message SayHiReq {}
+message SayHiReq {
+    string email =1 [(validate.rules).string.email=true];
+}
 
 // SayHiRsp is says hi response
 message SayHiRsp {

@@ -6,6 +6,8 @@ github.com/benbjohnson/clock v1.3.0 h1:ip6w0uFQkncKQ979AypyG0ER7mqUSBdKLOgAle/AT
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/envoyproxy/protoc-gen-validate v1.0.2 h1:QkIBuU5k+x7/QXPvPPnWXWlCdaBFApVqftFV6k087DA=
+github.com/envoyproxy/protoc-gen-validate v1.0.2/go.mod h1:GpiZQP3dDbg4JouG/NNS7QWXpgx6x8QiMKdmN72jogE=
 github.com/frankban/quicktest v1.14.4 h1:g2rn0vABPOOXmZUj+vbmUp0lPoXEMuhTpIluN0XL9UY=
 github.com/fsnotify/fsnotify v1.6.0 h1:n+5WquG0fcWoWp6xPWfHdbskMCQaFnG6PfBrh1Ky4HY=
 github.com/fsnotify/fsnotify v1.6.0/go.mod h1:sl3t1tCWJFWoRz9R8WJCbQihKKwmorjAbSClcnxKAGw=
@@ -132,6 +134,8 @@ trpc.group/trpc-go/trpc-filter/debuglog v1.0.0 h1:mrMpdwfW9KdMOgD17oBGWd8aUpgxki
 trpc.group/trpc-go/trpc-filter/debuglog v1.0.0/go.mod h1:KjJS8NHv2700k6B8a8h5dTJJYkXxrVZ9vCt2vIDexeY=
 trpc.group/trpc-go/trpc-filter/recovery v1.0.0 h1:Mn3eaKxrtDt1Jqdmg6XsA4QMu5OkDTF63g3bNnGZkbM=
 trpc.group/trpc-go/trpc-filter/recovery v1.0.0/go.mod h1:+G5aViMmmYLZ6mrqLAQnX4lqKFroNlu9Eb58l9DJAaA=
+trpc.group/trpc-go/trpc-filter/validation v1.0.1 h1:vSRewf8yQ2lXiXwZ0F0+w2Yk3NNyG2O2Rwq46CoY/L4=
+trpc.group/trpc-go/trpc-filter/validation v1.0.1/go.mod h1:NsZw4I7fvVnJSXVB86shTT0p1XqcbCqAdFicMyG+sxQ=
 trpc.group/trpc-go/trpc-go v1.0.1 h1:OsNr4YR8UdHUg0ZeCspeos4y+tHg4umS7K+vSTFARrU=
 trpc.group/trpc-go/trpc-go v1.0.1/go.mod h1:ubchj5XFTsPT5qy8TmzKF4R21XLf3Nb77iaHY2Nspc0=
 trpc.group/trpc/trpc-protocol/pb/go/trpc v1.0.0 h1:rMtHYzI0ElMJRxHtT5cD99SigFE6XzKK4PFtjcwokI0=

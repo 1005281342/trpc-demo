@@ -6,6 +6,7 @@ package main
 import (
 	pb "github.com/1005281342/trpc-demo/helloworld"
 	_ "trpc.group/trpc-go/trpc-filter/debuglog"
+	_ "trpc.group/trpc-go/trpc-filter/validation"
 	trpc "trpc.group/trpc-go/trpc-go"
 	"trpc.group/trpc-go/trpc-go/client"
 	"trpc.group/trpc-go/trpc-go/log"
@@ -32,7 +33,9 @@ func callHelloWorldServiceSayHi() {
 	)
 	ctx := trpc.BackgroundContext()
 	// Example usage of unary client.
-	reply, err := proxy.SayHi(ctx, &pb.SayHiReq{})
+	reply, err := proxy.SayHi(ctx, &pb.SayHiReq{
+		Email: "1005281342@qq.com",
+	})
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}

@@ -4,6 +4,7 @@ import (
 	pb "github.com/1005281342/trpc-demo/helloworld"
 	_ "trpc.group/trpc-go/trpc-filter/debuglog"
 	_ "trpc.group/trpc-go/trpc-filter/recovery"
+	_ "trpc.group/trpc-go/trpc-filter/validation"
 	trpc "trpc.group/trpc-go/trpc-go"
 	"trpc.group/trpc-go/trpc-go/log"
 )

@@ -343,3 +343,142 @@ uncheck "configure automatically",
 add import path as /usr/local/include.
 ```
 
+## 参数校验
+
+### 调整协议
+
+```protobuf
+// 导入依赖协议
+import "validate/validate.proto";
+
+// 设置校验规则
+// SayHiReq is says hi request
+message SayHiReq {
+    string email =1 [(validate.rules).string.email=true];
+}
+```
+
+调整完毕后生成桩代码需要添加 `--validate`，因此通过命令 `trpc create -p helloworld.proto -o ./stub/github.com/1005281342/trpc-demo/helloworld --rpconly --validate` 生成
+
+### 项目依赖设置
+
+调整协议后生成代码时，通过`--rpconly`设置仅更新桩代码，因此需要手动处理一些项目依赖
+
+1. 在 main.go 中 `import _ "trpc.group/trpc-go/trpc-filter/validation"`
+
+2. 在 trpc_go.yaml 的 `server.filter`、`client.filter`添加 `- validation`
+
+   ```yaml
+   server:  # Server configuration.
+     filter:  # List of interceptors for all service handler functions.
+       - validation
+       
+   client:  # Backend configuration for client calls.
+     filter:  # List of interceptors for all backend function calls.
+       - validation
+   ```
+
+   
+
+### 测试
+
+#### 客户端拦截验证
+
+设置客户端参数
+
+```go
+// Example usage of unary client.
+reply, err := proxy.SayHi(ctx, &pb.SayHiReq{
+  Email: "123",
+})
+```
+
+未注册插件时，初始化失败
+
+```
+panic: setup plugin fail: client config: filter validation no registered, do not configure
+
+goroutine 1 [running]:
+main.main()
+        ~/go/src/github.com/1005281342/trpc-demo/cmd/client/main.go:22 +0x99
+exit status 2
+```
+
+注册插件
+
+`import _ "trpc.group/trpc-go/trpc-filter/validation"`
+
+日志
+
+```
+2023-10-22 11:17:51.729 ERROR   debuglog@v1.0.0/log.go:240      client request:/helloworld.HelloWorldService/SayHi, cost:2.282122ms, to:127.0.0.1:8000, err:type:business, code:51, msg:invalid SayHiReq.Email: value must be a valid email address | caused by: mail: missing '@' or angle-addr
+2023-10-22 11:17:51.729 FATAL   client/main.go:40       err: type:business, code:51, msg:invalid SayHiReq.Email: value must be a valid email address | caused by: mail: missing '@' or angle-addr
+exit status 1
+```
+
+
+
+#### 服务端拦截验证
+
+客户端请求
+
+``` http request
+POST http://127.0.0.1:8001/helloworld.HelloWorldService/SayHi
+Content-Type: application/json
+
+{
+  "email": "123"
+}
+```
+
+客户端收到响应
+
+```
+POST http://127.0.0.1:8001/helloworld.HelloWorldService/SayHi
+
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Trpc-Error-Msg: invalid SayHiReq.Email: value must be a valid email address | caused by: mail: missing '@' or angle-addr
+Trpc-Func-Ret: 51
+X-Content-Type-Options: nosniff
+Date: Sun, 22 Oct 2023 03:11:21 GMT
+Content-Length: 0
+
+<Response body is empty>
+
+Response code: 400 (Bad Request); Time: 3ms (3 ms); Content length: 0 bytes (0 B)
+```
+
+服务端日志
+
+```
+2023-10-22 11:11:21.170 ERROR   debuglog@v1.0.0/log.go:203      server request:/helloworld.HelloWorldService/SayHi, cost:14.985µs, from:127.0.0.1:59693, err:type:business, code:51, msg:invalid SayHiReq.Email: value must be a valid email address | caused by: mail: missing '@' or angle-addr, total timeout:999.781461ms
+2023-10-22 11:11:21.170 DEBUG   server/service.go:234   service: helloworld.HelloWorldServiceHTTP handle err (if caused by health checking, this error can be ignored): type:business, code:51, msg:invalid SayHiReq.Email: value must be a valid email address | caused by: mail: missing '@' or angle-addr
+```
+
+### 响应成功验证
+
+请求参数
+
+```go
+// Example usage of unary client.
+reply, err := proxy.SayHi(ctx, &pb.SayHiReq{
+  Email: "1005281342@qq.com",
+})
+```
+
+客户端日志
+
+```
+2023-10-22 11:20:31.654 DEBUG   debuglog@v1.0.0/log.go:236      client request:/helloworld.HelloWorldService/SayHi, cost:1.078722ms, to:127.0.0.1:8000
+2023-10-22 11:20:31.654 DEBUG   client/main.go:42       [SayHi] -- simple  rpc   receive: msg:"hi"
+```
+
+服务端日志
+
+```
+2023-10-22 11:20:31.654 DEBUG   debuglog@v1.0.0/log.go:196      server request:/helloworld.HelloWorldService/SayHi, cost:36.894µs, from:127.0.0.1:61202
+```
+
+
+

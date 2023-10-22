@@ -11,6 +11,7 @@ server:  # Server configuration.
   filter:  # List of interceptors for all service handler functions.
     - simpledebuglog
     - recovery  # Intercept panics from business processing goroutines created by the framework.
+    - validation
   service:  # Services provided by the business, can have multiple.
     - name: helloworld.HelloWorldService  # Route name for the service.
       ip: 127.0.0.1  # Service listening IP address, can use placeholder ${ip}. Use either ip or nic, ip takes priority.
@@ -33,6 +34,7 @@ client:  # Backend configuration for client calls.
   namespace: Development  # Environment for all backends.
   filter:  # List of interceptors for all backend function calls.
     - simpledebuglog
+    - validation
   service:  # Configuration for individual backends.
     - name: helloworld.HelloWorldService  # Service name for the backend.
       namespace: Development  # Environment for the backend.
